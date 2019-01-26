@@ -1396,6 +1396,14 @@ class SmartCashElectrumX(DashElectrumX):
 
 
 class AuxPoWElectrumX(ElectrumX):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # AuxPoW headers are significantly larger, so the default MAX_SEND is
+        # insufficient.  In Namecoin mainnet, 5 MB wasn't enough to sync, while
+        # 10 MB worked fine.
+        self.env.max_send = max(10000000, self.env.max_send)
+        self.connection.max_response_size = self.env.max_send
+
     async def block_header(self, height, cp_height=0):
         result = await super().block_header(height, cp_height)
 
